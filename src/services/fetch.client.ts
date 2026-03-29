@@ -1,3 +1,5 @@
+// The different between fetch client/server is headers config. Check the code below
+
 import { apiResponseError, BASE_URL, defaultResponse, Method } from "./helpers";
 import { ApiConfig, ApiResponse } from "./type";
 import { requestManager } from "./manager";

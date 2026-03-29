@@ -1,3 +1,5 @@
+// The different between fetch client/server is headers config. Check the code below
+
 import { cookies } from "next/headers";
 import { apiResponseError, BASE_URL, defaultResponse, Method } from "./helpers";
 import { requestManager } from "./manager";
