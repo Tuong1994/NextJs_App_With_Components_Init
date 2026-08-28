@@ -29,25 +29,18 @@ const call = async <TBody, TData = any>(config: ApiConfig<TBody>): Promise<ApiRe
     headers: defaultHeaders,
     credentials: "include",
     // ❗ Default: no-cache for mutations, cache for GET
-    cache: method === Method.GET ? "force-cache" : "no-store",
-    next: method === Method.GET ? { revalidate: 0 } : undefined, // ISR optional
+    ...(method === Method.GET
+      ? { next: { revalidate: options?.next?.revalidate ?? 60 } }
+      : { cache: "no-store" }), // ISR optional
     ...options,
     body: method !== Method.GET ? finalBody : undefined,
   };
 
-  if (abortKey) {
-    controller = requestManager.create(abortKey);
-    reqConfig.signal = controller.signal;
-  }
   // fetch only throws on network errors (CORS, offline, DNS fail...)
   // → HTTP errors (4xx/5xx) DO NOT trigger catch, so we must handle them separately.
   try {
     res = await fetch(url, reqConfig);
   } catch (error: any) {
-    if (error.name === "AbortError") {
-      if (abortKey) requestManager.abort(abortKey);
-      return { ...apiResponse, success: false, error: apiResponseError(-1, error) };
-    }
     // Network-level error → status is unknown (set 0)
     return { ...apiResponse, success: false, error: apiResponseError(0, error) };
   }
@@ -65,20 +58,20 @@ const call = async <TBody, TData = any>(config: ApiConfig<TBody>): Promise<ApiRe
   return { ...apiResponse, success: true, data };
 };
 
-const Get = <TData>(apiPath: string, abortKey?: string, options?: RequestInit) => {
-  return call<any, TData>({ method: Method.GET, apiPath, abortKey, options });
+const Get = <TData>(apiPath: string, options?: RequestInit) => {
+  return call<any, TData>({ method: Method.GET, apiPath, options });
 };
 
-const Post = <TBody, TData>(apiPath: string, body: TBody, abortKey?: string, options?: RequestInit) => {
-  return call<TBody, TData>({ method: Method.POST, apiPath, body, abortKey, options });
+const Post = <TBody, TData>(apiPath: string, body: TBody, options?: RequestInit) => {
+  return call<TBody, TData>({ method: Method.POST, apiPath, body, options });
 };
 
-const Put = <TBody, TData>(apiPath: string, body: TBody, abortKey?: string, options?: RequestInit) => {
-  return call<TBody, TData>({ method: Method.PUT, apiPath, body, abortKey, options });
+const Put = <TBody, TData>(apiPath: string, body: TBody, options?: RequestInit) => {
+  return call<TBody, TData>({ method: Method.PUT, apiPath, body, options });
 };
 
-const Delete = <TBody, TData>(apiPath: string, body?: TBody, abortKey?: string, options?: RequestInit) => {
-  return call<any, TData>({ method: Method.DELETE, apiPath, body, abortKey, options });
+const Delete = <TBody, TData>(apiPath: string, body?: TBody, options?: RequestInit) => {
+  return call<any, TData>({ method: Method.DELETE, apiPath, body, options });
 };
 
 const FetchServer = { Get, Post, Put, Delete };

@@ -35,8 +35,9 @@ const call = async <TBody, TData = any>(config: ApiConfig<TBody>): Promise<ApiRe
     headers: defaultHeaders,
     credentials: "include",
     // ❗ Default: no-cache for mutations, cache for GET
-    cache: method === Method.GET ? "force-cache" : "no-store",
-    next: method === Method.GET ? { revalidate: 0 } : undefined, // ISR optional
+    ...(method === Method.GET
+      ? { next: { revalidate: options?.next?.revalidate ?? 60 } }
+      : { cache: "no-store" }), // ISR optional
     ...options,
     body: method !== Method.GET ? finalBody : undefined,
   };
