@@ -2,14 +2,12 @@
 
 import { cookies } from "next/headers";
 import { apiResponseError, BASE_URL, defaultResponse, Method } from "./helpers";
-import { requestManager } from "./manager";
 import { ApiConfig, ApiResponse } from "./type";
 
 const call = async <TBody, TData = any>(config: ApiConfig<TBody>): Promise<ApiResponse<TData>> => {
-  const { apiPath, method, body, abortKey, options = {} } = config;
+  const { apiPath, method, body, options = {} } = config;
 
   let apiResponse: ApiResponse<TData> = defaultResponse();
-  let controller: AbortController | null = null;
   let finalBody = body as any;
   let res: Response;
   const url = `${BASE_URL}${apiPath}`;
