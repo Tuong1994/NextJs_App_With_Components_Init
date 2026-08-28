@@ -30,12 +30,12 @@ const useDateRange = (year: number, month: number) => {
       dates.push(getDate(newDate, date, "sub"));
     }
 
-    for (let i = 1; i < lastDateOfMonth; i++) {
+    for (let i = 1; i <= lastDateOfMonth; i++) {
       const newDate = new Date(year, month, i);
       dates.push(getDate(newDate, i, "main"));
     }
 
-    for (let i = lastDayOfMonth; i < 7; i++) {
+    for (let i = lastDayOfMonth; i < 6; i++) {
       const date = i - lastDayOfMonth + 1;
       const newDate = new Date(year, month + 1, date);
       dates.push(getDate(newDate, date, "sub"));
